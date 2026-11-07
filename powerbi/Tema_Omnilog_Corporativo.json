@@ -1,0 +1,70 @@
+{
+  "name": "Omnilog Corporativo (padrão Vivo)",
+  "dataColors": [
+    "#660099",
+    "#9A4FD9",
+    "#3D005C",
+    "#C39AF0",
+    "#6B6475",
+    "#B48BE0",
+    "#4A0070",
+    "#E0CBF8"
+  ],
+  "background": "#FFFFFF",
+  "foreground": "#1A1220",
+  "tableAccent": "#660099",
+  "good": "#660099",
+  "neutral": "#C39AF0",
+  "bad": "#C62828",
+  "maximum": "#3D005C",
+  "center": "#9A4FD9",
+  "minimum": "#F3EAF9",
+  "null": "#DCD3E4",
+  "textClasses": {
+    "callout": { "fontSize": 26, "fontFace": "Segoe UI Semibold", "color": "#1A1220" },
+    "title":   { "fontSize": 12, "fontFace": "Segoe UI Semibold", "color": "#1A1220" },
+    "header":  { "fontSize": 12, "fontFace": "Segoe UI Semibold", "color": "#1A1220" },
+    "label":   { "fontSize": 10, "fontFace": "Segoe UI", "color": "#564B5F" }
+  },
+  "visualStyles": {
+    "*": {
+      "*": {
+        "background": [ { "show": true, "color": { "solid": { "color": "#FFFFFF" } }, "transparency": 0 } ],
+        "border": [ { "show": true, "color": { "solid": { "color": "#E6DCEF" } }, "radius": 6 } ],
+        "dropShadow": [ { "show": false } ],
+        "title": [ { "show": true, "fontColor": { "solid": { "color": "#1A1220" } }, "fontSize": 12, "fontFamily": "Segoe UI Semibold" } ],
+        "padding": [ { "top": 8, "bottom": 8, "left": 10, "right": 10 } ]
+      }
+    },
+    "page": {
+      "*": {
+        "background": [ { "color": { "solid": { "color": "#F6F2FA" } }, "transparency": 0 } ],
+        "outspace": [ { "color": { "solid": { "color": "#F6F2FA" } } } ]
+      }
+    },
+    "card": {
+      "*": {
+        "labels": [ { "fontSize": 24, "color": { "solid": { "color": "#660099" } } } ],
+        "categoryLabels": [ { "fontSize": 10, "color": { "solid": { "color": "#564B5F" } } } ]
+      }
+    },
+    "slicer": {
+      "*": {
+        "header": [ { "fontColor": { "solid": { "color": "#564B5F" } }, "textSize": 10 } ],
+        "items": [ { "fontColor": { "solid": { "color": "#1A1220" } }, "textSize": 10 } ]
+      }
+    },
+    "tableEx": {
+      "*": {
+        "columnHeaders": [ { "fontColor": { "solid": { "color": "#FFFFFF" } }, "backColor": { "solid": { "color": "#660099" } } } ],
+        "values": [ { "backColorSecondary": { "solid": { "color": "#FAF7FC" } } } ]
+      }
+    },
+    "pivotTable": {
+      "*": {
+        "columnHeaders": [ { "fontColor": { "solid": { "color": "#FFFFFF" } }, "backColor": { "solid": { "color": "#660099" } } } ],
+        "rowHeaders": [ { "fontColor": { "solid": { "color": "#1A1220" } } } ]
+      }
+    }
+  }
+}

@@ -1,0 +1,68 @@
+/// Produtos. Origem: bi.vw_d_Produto.
+table d_Produto
+	lineageTag: 5f524f80-8ef5-483f-822c-7c895b582e18
+
+	column Id_Produto
+		dataType: int64
+		isHidden
+		isKey
+		formatString: 0
+		lineageTag: f23dfcf3-3afa-439c-819e-907b67717b94
+		summarizeBy: none
+		sourceColumn: Id_Produto
+
+	column SKU
+		dataType: string
+		lineageTag: 1343e3bf-91c9-487a-8805-a688658d094a
+		summarizeBy: none
+		sourceColumn: SKU
+
+	column Nome_Produto
+		dataType: string
+		lineageTag: 153b6232-82fc-4855-af33-8abddc1110cf
+		summarizeBy: none
+		sourceColumn: Nome_Produto
+
+	/// Categoria do produto (técnica). Para filtros, use d_Categoria, que também filtra as metas.
+	column Categoria
+		dataType: string
+		isHidden
+		lineageTag: c1a8572a-169c-467c-b0e8-b1e1d77fdadf
+		summarizeBy: none
+		sourceColumn: Categoria
+
+	column Custo_Unitario
+		dataType: double
+		formatString: \R$ #,##0.00
+		lineageTag: 5d6d7980-7529-4672-a01e-d5629f32f82a
+		summarizeBy: none
+		sourceColumn: Custo_Unitario
+
+	column Preco_Tabela
+		dataType: double
+		formatString: \R$ #,##0.00
+		lineageTag: 97bdb08c-4a27-4d94-9fdb-2d454e941977
+		summarizeBy: none
+		sourceColumn: Preco_Tabela
+
+	column Margem_Tabela_Pct
+		dataType: double
+		formatString: 0.0%
+		lineageTag: 5b14e801-3702-4503-8516-d3e8fe82fb54
+		summarizeBy: none
+		sourceColumn: Margem_Tabela_Pct
+
+	partition d_Produto = m
+		mode: import
+		source =
+				let
+				    // Mesma estrutura nas duas origens: a view SQL bi.vw_d_Produto ou o CSV equivalente
+				    Dados =
+				        if FonteDados = "SQL"
+				        then Sql.Database(Servidor, BancoDeDados){[Schema = "bi", Item = "vw_d_Produto"]}[Data]
+				        else fnLerCsv("d_Produto.csv", {{"Id_Produto", Int64.Type}, {"SKU", type text}, {"Nome_Produto", type text}, {"Categoria", type text}, {"Custo_Unitario", type number}, {"Preco_Tabela", type number}, {"Margem_Tabela_Pct", type number}})
+				in
+				    Dados
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,116 @@
+{
+  "name": "6bb5c86600000000001a",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "visual": {
+    "visualType": "cardVisual",
+    "query": {
+      "queryState": {
+        "Data": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Receita Líquida"
+                }
+              },
+              "nativeQueryRef": "Receita Líquida",
+              "queryRef": "_Medidas.Receita Líquida"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "% Part. Filial na Regional"
+                }
+              },
+              "nativeQueryRef": "% Part. Filial na Regional",
+              "queryRef": "_Medidas.% Part. Filial na Regional"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "% Margem"
+                }
+              },
+              "nativeQueryRef": "% Margem",
+              "queryRef": "_Medidas.% Margem"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "YoY %"
+                }
+              },
+              "nativeQueryRef": "YoY %",
+              "queryRef": "_Medidas.YoY %"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Ranking da Filial (Tooltip)"
+                }
+              },
+              "nativeQueryRef": "Ranking da Filial (Tooltip)",
+              "queryRef": "_Medidas.Ranking da Filial (Tooltip)"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Resumo da filial'"
+                }
+              }
+            },
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "position": {
+    "x": 0,
+    "y": 0,
+    "z": 0,
+    "height": 130,
+    "width": 320,
+    "tabOrder": 0
+  }
+}

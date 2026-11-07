@@ -1,0 +1,48 @@
+/// Origem dos dados: "CSV" (arquivos em dados_csv, sem banco — modo de avaliação) ou "SQL" (views bi.* no SQL Server — produção).
+expression FonteDados = "CSV" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: a04eb000-9cb8-4b4a-8881-d6f88151130e
+
+	annotation PBI_ResultType = Text
+
+/// Pasta com os arquivos CSV gerados a partir das mesmas regras das views SQL.
+expression PastaDadosCSV = "C:\Dados\Omnilog\dados_csv" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: cba8511a-10a0-4419-ae8e-00df1b72289a
+
+	annotation PBI_ResultType = Text
+
+/// Servidor SQL. Ex.: localhost (Developer) ou localhost\SQLEXPRESS (Express). Usado quando FonteDados = "SQL".
+expression Servidor = "localhost" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: f887756b-d078-4d2d-b360-3e23b628014e
+
+	annotation PBI_ResultType = Text
+
+expression BancoDeDados = "OmnilogAnalytics" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: edc2562b-4b72-4e93-9980-3056534c2dbb
+
+	annotation PBI_ResultType = Text
+
+/// Início da janela de atualização incremental (substituído pelo serviço a cada partição).
+expression RangeStart = #datetime(2023, 1, 1, 0, 0, 0) meta [IsParameterQuery=true, Type="DateTime", IsParameterQueryRequired=true]
+	lineageTag: f6e91980-6e5d-4058-a42a-fced945043a9
+
+	annotation PBI_ResultType = DateTime
+
+/// Fim (exclusivo) da janela de atualização incremental.
+expression RangeEnd = #datetime(2025, 1, 1, 0, 0, 0) meta [IsParameterQuery=true, Type="DateTime", IsParameterQueryRequired=true]
+	lineageTag: 2fdd7779-e1e4-402c-9b7c-3ab95b2fffc3
+
+	annotation PBI_ResultType = DateTime
+
+/// Lê um CSV da pasta de dados (UTF-8, vírgula, ponto decimal) e aplica os tipos informados.
+expression fnLerCsv =
+		(arquivo as text, tipos as list) as table =>
+		let
+		    Bruto = Csv.Document(File.Contents(PastaDadosCSV & "\" & arquivo), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+		    Cabecalho = Table.PromoteHeaders(Bruto, [PromoteAllScalars = true]),
+		    Tipado = Table.TransformColumnTypes(Cabecalho, tipos, "en-US")
+		in
+		    Tipado
+	lineageTag: f4c822a1-8726-4018-8ad5-9eb40c683f8e
+
+	annotation PBI_ResultType = Function
+

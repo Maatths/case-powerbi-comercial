@@ -1,0 +1,42 @@
+/// Dimensão conformada de Regional: filtra Vendas e Metas. Filtrada pelo RLS.
+table d_Regional
+	lineageTag: d18f594c-7ede-49a5-8341-54375c6b9237
+
+	column Id_Regional
+		dataType: int64
+		isHidden
+		isKey
+		formatString: 0
+		lineageTag: cd777196-be5a-4f18-b165-38bb28efafd2
+		summarizeBy: none
+		sourceColumn: Id_Regional
+
+	column Regional
+		dataType: string
+		lineageTag: 1e5dc1fb-a3f3-4c32-a89e-a437b26c9a26
+		summarizeBy: none
+		sourceColumn: Regional
+		sortByColumn: Ordem
+
+	column Ordem
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 09ff015c-259c-415a-820e-5b7786c2a4b8
+		summarizeBy: none
+		sourceColumn: Ordem
+
+	partition d_Regional = m
+		mode: import
+		source =
+				let
+				    // Mesma estrutura nas duas origens: a view SQL bi.vw_d_Regional ou o CSV equivalente
+				    Dados =
+				        if FonteDados = "SQL"
+				        then Sql.Database(Servidor, BancoDeDados){[Schema = "bi", Item = "vw_d_Regional"]}[Data]
+				        else fnLerCsv("d_Regional.csv", {{"Id_Regional", Int64.Type}, {"Regional", type text}, {"Ordem", Int64.Type}})
+				in
+				    Dados
+
+	annotation PBI_ResultType = Table
+

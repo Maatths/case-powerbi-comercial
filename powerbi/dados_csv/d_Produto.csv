@@ -1,0 +1,11 @@
+﻿Id_Produto,SKU,Nome_Produto,Categoria,Custo_Unitario,Preco_Tabela,Margem_Tabela_Pct
+101,"LP-001","Pneu Pesado Tracionador 295/80","Linha Pesada",1450.00,2190.00,0.3379
+102,"LP-002","Tambor de Freio Dianteiro HD","Linha Pesada",320.00,520.00,0.3846
+103,"LP-003","Kit Amortecedor Pneumático","Linha Pesada",890.00,1340.00,0.3358
+104,"AP-101","Pastilha de Freio Cerâmica","Autopeças",110.00,195.00,0.4359
+105,"AP-102","Disco de Freio Ventilado","Autopeças",180.00,290.00,0.3793
+106,"AP-103","Filtro de Ar de Alta Eficiência","Autopeças",45.00,85.00,0.4706
+107,"AP-104","Bateria Automotiva Selada 60Ah","Autopeças",260.00,420.00,0.3810
+108,"FL-201","Óleo Lubrificante Sintético 5W30 (20L)","Fluidos & Lubrificantes",210.00,360.00,0.4167
+109,"FL-202","Líquido de Arrefecimento Long Life (5L)","Fluidos & Lubrificantes",35.00,68.00,0.4853
+110,"FL-203","Graxa Grafitada Industrial (10Kg)","Fluidos & Lubrificantes",140.00,245.00,0.4286

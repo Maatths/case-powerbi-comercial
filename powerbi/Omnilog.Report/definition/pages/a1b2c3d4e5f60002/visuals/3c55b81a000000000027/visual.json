@@ -1,0 +1,272 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "3c55b81a000000000027",
+  "position": {
+    "x": 20,
+    "y": 172,
+    "z": 39,
+    "height": 645,
+    "width": 1242,
+    "tabOrder": 39
+  },
+  "visual": {
+    "visualType": "pivotTable",
+    "query": {
+      "queryState": {
+        "Rows": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "d_Regional"
+                    }
+                  },
+                  "Property": "Regional"
+                }
+              },
+              "nativeQueryRef": "Regional",
+              "active": true,
+              "queryRef": "d_Regional.Regional"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "d_Filial"
+                    }
+                  },
+                  "Property": "Nome_Filial"
+                }
+              },
+              "nativeQueryRef": "Nome_Filial",
+              "active": true,
+              "queryRef": "d_Filial.Nome_Filial"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "d_Produto"
+                    }
+                  },
+                  "Property": "Nome_Produto"
+                }
+              },
+              "nativeQueryRef": "Nome_Produto",
+              "active": true,
+              "queryRef": "d_Produto.Nome_Produto"
+            }
+          ]
+        },
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Receita Líquida"
+                }
+              },
+              "nativeQueryRef": "Receita Líquida",
+              "queryRef": "_Medidas.Receita Líquida"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "% Part. Filial na Regional"
+                }
+              },
+              "nativeQueryRef": "% Part. Filial na Regional",
+              "queryRef": "_Medidas.% Part. Filial na Regional"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "% Margem"
+                }
+              },
+              "nativeQueryRef": "% Margem",
+              "queryRef": "_Medidas.% Margem"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "YoY %"
+                }
+              },
+              "nativeQueryRef": "YoY %",
+              "queryRef": "_Medidas.YoY %"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Receita Líquida Média Móvel 3M"
+                }
+              },
+              "nativeQueryRef": "Receita Líquida Média Móvel 3M",
+              "queryRef": "_Medidas.Receita Líquida Média Móvel 3M"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Ranking da Filial"
+                }
+              },
+              "nativeQueryRef": "Ranking da Filial",
+              "queryRef": "_Medidas.Ranking da Filial"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "% Atingimento da Meta"
+                }
+              },
+              "nativeQueryRef": "% Atingimento da Meta",
+              "queryRef": "_Medidas.% Atingimento da Meta"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Status da Meta"
+                }
+              },
+              "nativeQueryRef": "Status da Meta",
+              "queryRef": "_Medidas.Status da Meta"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "12D"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Detalhamento: regional › filial › produto (a meta existe só em regional × categoria)'"
+                }
+              }
+            },
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "background": [
+        {
+          "properties": {
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#FFFFFF'"
+                    }
+                  }
+                }
+              }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            },
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "visualHeader": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "isHidden": true
+}

@@ -1,0 +1,121 @@
+/// Fato de vendas no grão item de nota fiscal / dia. Origem: bi.vw_f_Vendas. Preparada para atualização incremental (RangeStart/RangeEnd).
+table f_Vendas
+	lineageTag: 8d7d3ccf-dbad-46d3-b464-895804c8ba39
+
+	column Numero_NF
+		dataType: string
+		isHidden
+		lineageTag: 56db33af-a75a-45f2-84a7-9d54e7766009
+		summarizeBy: none
+		sourceColumn: Numero_NF
+
+	column Data_Venda
+		dataType: dateTime
+		isHidden
+		formatString: dd/mm/yyyy
+		lineageTag: 3bb295ef-9f2f-447c-bbf5-2211fa0968c5
+		summarizeBy: none
+		sourceColumn: Data_Venda
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Id_Filial
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 20e29f4c-2f4c-4b68-9040-a1953cf1e1d1
+		summarizeBy: none
+		sourceColumn: Id_Filial
+
+	column Id_Produto
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: fa8d36a9-4dec-489d-933c-d3b9f8b6d1f1
+		summarizeBy: none
+		sourceColumn: Id_Produto
+
+	column Id_Regional
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 66c08875-5a34-420e-a827-6360630e05a8
+		summarizeBy: none
+		sourceColumn: Id_Regional
+
+	column Id_Categoria
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 6aa0e1c6-b176-48ae-86f0-2cc107c14fc4
+		summarizeBy: none
+		sourceColumn: Id_Categoria
+
+	column Quantidade
+		dataType: int64
+		isHidden
+		formatString: #,##0
+		lineageTag: 0a7521ff-2e06-4ee4-abc0-787189c96d75
+		summarizeBy: sum
+		sourceColumn: Quantidade
+
+	column Desconto_Total
+		dataType: double
+		isHidden
+		formatString: \R$ #,##0.00
+		lineageTag: a12114b7-9d2f-4aed-8339-f2c8e0a112ea
+		summarizeBy: sum
+		sourceColumn: Desconto_Total
+
+	column Valor_Bruto
+		dataType: double
+		isHidden
+		formatString: \R$ #,##0.00
+		lineageTag: 493ad5bf-328a-4175-a52a-3cf8257fa4a3
+		summarizeBy: sum
+		sourceColumn: Valor_Bruto
+
+	column Valor_Liquido
+		dataType: double
+		isHidden
+		formatString: \R$ #,##0.00
+		lineageTag: 3d72fd84-57d3-4a8f-8963-b8dfd63e12dc
+		summarizeBy: sum
+		sourceColumn: Valor_Liquido
+
+	column Custo_Total
+		dataType: double
+		isHidden
+		formatString: \R$ #,##0.00
+		lineageTag: 553693d7-3b76-4e4a-b5f0-aada70d99644
+		summarizeBy: sum
+		sourceColumn: Custo_Total
+
+	column Margem_Contribuicao
+		dataType: double
+		isHidden
+		formatString: \R$ #,##0.00
+		lineageTag: d10fa1e9-f88a-4dad-b0cf-b8389ae5e4a2
+		summarizeBy: sum
+		sourceColumn: Margem_Contribuicao
+
+	partition f_Vendas = m
+		mode: import
+		source =
+				let
+				    // Mesma estrutura nas duas origens: a view SQL bi.vw_f_Vendas ou o CSV equivalente
+				    Dados =
+				        if FonteDados = "SQL"
+				        then Sql.Database(Servidor, BancoDeDados){[Schema = "bi", Item = "vw_f_Vendas"]}[Data]
+				        else fnLerCsv("f_Vendas.csv", {{"Numero_NF", type text}, {"Data_Venda", type date}, {"Id_Filial", Int64.Type}, {"Id_Produto", Int64.Type}, {"Id_Regional", Int64.Type}, {"Id_Categoria", Int64.Type}, {"Quantidade", Int64.Type}, {"Desconto_Total", type number}, {"Valor_Bruto", type number}, {"Valor_Liquido", type number}, {"Custo_Total", type number}, {"Margem_Contribuicao", type number}}),
+				    // Filtro da atualização incremental: ">=" no início e "<" no fim evita duplicidade entre partições.
+				    // Em SQL dobra para WHERE Data_Venda >= @a AND Data_Venda < @b (seek em IX_Fato_Vendas_Data_Venda).
+				    FiltroIncremental = Table.SelectRows(
+				        Dados,
+				        each [Data_Venda] >= Date.From(RangeStart) and [Data_Venda] < Date.From(RangeEnd)
+				    )
+				in
+				    FiltroIncremental
+
+	annotation PBI_ResultType = Table
+

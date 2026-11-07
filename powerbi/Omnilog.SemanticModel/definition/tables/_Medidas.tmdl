@@ -1,0 +1,649 @@
+/// Tabela isolada de medidas. Organizada em pastas funcionais (displayFolder).
+table _Medidas
+	lineageTag: 9972901b-ef8b-4ad4-b733-9a500b540f4a
+
+	/// Soma de Quantidade × Preço Praticado (antes de descontos).
+	measure 'Receita Bruta' = SUM ( f_Vendas[Valor_Bruto] )
+		formatString: \R$ #,##0
+		displayFolder: 01. Faturamento
+		lineageTag: 8003b7ec-1012-4726-a383-285374744179
+
+	/// Total de descontos concedidos nas notas fiscais.
+	measure Descontos = SUM ( f_Vendas[Desconto_Total] )
+		formatString: \R$ #,##0
+		displayFolder: 01. Faturamento
+		lineageTag: aa3f9cd7-21d1-41dd-a054-14ff337d16ce
+
+	/// Receita Bruta − Descontos. Métrica principal de faturamento e base das metas.
+	measure 'Receita Líquida' = SUM ( f_Vendas[Valor_Liquido] )
+		formatString: \R$ #,##0
+		displayFolder: 01. Faturamento
+		lineageTag: 27991e5c-e9a1-4f4c-9b18-6a7764b3ea52
+
+	/// Descontos ÷ Receita Bruta.
+	measure '% Desconto' =
+			VAR _descontos = [Descontos]
+			VAR _receitaBruta = [Receita Bruta]
+			RETURN
+				DIVIDE ( _descontos, _receitaBruta )
+		formatString: 0.0%
+		displayFolder: 01. Faturamento
+		lineageTag: e6f10944-1697-470b-871c-a51d0dc2da25
+
+	/// Unidades vendidas.
+	measure 'Quantidade Vendida' = SUM ( f_Vendas[Quantidade] )
+		formatString: #,##0
+		displayFolder: 01. Faturamento
+		lineageTag: 7066e485-4c8b-4604-8e57-7b74c6cff3e4
+
+	/// Número de notas fiscais distintas.
+	measure 'Qtd. Notas Fiscais' = DISTINCTCOUNT ( f_Vendas[Numero_NF] )
+		formatString: #,##0
+		displayFolder: 01. Faturamento
+		lineageTag: d32e5d52-cff3-445b-a415-f3018351b076
+
+	/// Receita Líquida ÷ Qtd. Notas Fiscais.
+	measure 'Ticket Médio por NF' =
+			VAR _receita = [Receita Líquida]
+			VAR _notas = [Qtd. Notas Fiscais]
+			RETURN
+				DIVIDE ( _receita, _notas )
+		formatString: \R$ #,##0
+		displayFolder: 01. Faturamento
+		lineageTag: 0b874995-33db-4280-9712-f48f33c1cb33
+
+	/// Quantidade × Custo Unitário do produto.
+	measure 'Custo Total' = SUM ( f_Vendas[Custo_Total] )
+		formatString: \R$ #,##0
+		displayFolder: 02. Custo e Margem
+		lineageTag: 4f37c840-ab35-4e7c-ba8b-1ff974b7fb4d
+
+	/// Receita Líquida − Custo Total.
+	measure 'Margem de Contribuição' = SUM ( f_Vendas[Margem_Contribuicao] )
+		formatString: \R$ #,##0
+		displayFolder: 02. Custo e Margem
+		lineageTag: e93a0650-02a8-4690-8232-0f3a3b782385
+
+	/// Margem de Contribuição ÷ Receita Líquida.
+	measure '% Margem' =
+			VAR _margem = [Margem de Contribuição]
+			VAR _receita = [Receita Líquida]
+			RETURN
+				DIVIDE ( _margem, _receita )
+		formatString: 0.0%
+		displayFolder: 02. Custo e Margem
+		lineageTag: 711c15c4-b858-4391-b0b7-c050eb5d54a5
+
+	/// % Margem do trimestre imediatamente anterior. Exibida só quando há um único trimestre no contexto (no ano inteiro, deslocar -1 trimestre compararia out–set, o que não é "trimestre anterior").
+	measure '% Margem Trimestre Anterior' =
+			VAR _resultado =
+				CALCULATE ( [% Margem], DATEADD ( d_Calendario[Data], -1, QUARTER ) )
+			RETURN
+				IF ( HASONEVALUE ( d_Calendario[Ano_Trimestre] ), _resultado )
+		formatString: 0.0%
+		displayFolder: 02. Custo e Margem
+		lineageTag: d26d8eee-b898-454a-807f-9286a2e9f76e
+
+	/// Variação da % Margem contra o trimestre anterior, em pontos percentuais. Negativo = queda de margem. Requer um único trimestre no contexto.
+	measure 'Δ Margem vs Trimestre Anterior (p.p.)' =
+			VAR _margemAtual = [% Margem]
+			VAR _margemAnterior = [% Margem Trimestre Anterior]
+			RETURN
+				IF (
+					NOT ISBLANK ( _margemAtual ) && NOT ISBLANK ( _margemAnterior ),
+					( _margemAtual - _margemAnterior ) * 100
+				)
+		formatString: +0.0;-0.0;0.0
+		displayFolder: 02. Custo e Margem
+		lineageTag: ec054d8e-a000-462c-96a5-95c6044b6a8a
+
+	/// % Margem do mesmo período no ano anterior.
+	measure '% Margem Ano Anterior' =
+			VAR _resultado =
+				CALCULATE ( [% Margem], SAMEPERIODLASTYEAR ( d_Calendario[Data] ) )
+			RETURN
+				_resultado
+		formatString: 0.0%
+		displayFolder: 02. Custo e Margem
+		lineageTag: 155a2eb1-a0f4-4c40-a43b-a9724d9ee560
+
+	/// Variação da % Margem contra o mesmo período do ano anterior, em pontos percentuais. Funciona em qualquer granularidade (ano, trimestre, mês).
+	measure 'Δ Margem vs Ano Anterior (p.p.)' =
+			VAR _margemAtual = [% Margem]
+			VAR _margemAnterior = [% Margem Ano Anterior]
+			RETURN
+				IF (
+					NOT ISBLANK ( _margemAtual ) && NOT ISBLANK ( _margemAnterior ),
+					( _margemAtual - _margemAnterior ) * 100
+				)
+		formatString: +0.0;-0.0;0.0
+		displayFolder: 02. Custo e Margem
+		lineageTag: 67554281-e7ce-4654-a444-c789cfdc9f51
+
+	/// Meta de faturamento (Regional × Categoria × Mês). Em períodos menores que o mês é distribuída proporcionalmente aos dias úteis. Não é exibida quando há filtro de Filial ou Produto (a meta não existe nesse grão).
+	measure 'Meta de Faturamento' =
+			VAR _nivelSemMeta =
+				ISFILTERED ( d_Filial ) || ISFILTERED ( d_Produto )
+			VAR _metaProporcional =
+				SUMX (
+					VALUES ( d_Calendario[AnoMes_Num] ),
+					VAR _anoMes = d_Calendario[AnoMes_Num]
+					VAR _diasUteisSelecionados =
+						CALCULATE ( COUNTROWS ( d_Calendario ), d_Calendario[Flag_Dia_Util] = TRUE () )
+					VAR _diasUteisMes =
+						CALCULATE (
+							COUNTROWS ( d_Calendario ),
+							REMOVEFILTERS ( d_Calendario ),
+							d_Calendario[AnoMes_Num] = _anoMes,
+							d_Calendario[Flag_Dia_Util] = TRUE ()
+						)
+					VAR _metaMes =
+						CALCULATE (
+							SUM ( f_Metas[Meta_Faturamento] ),
+							REMOVEFILTERS ( d_Calendario ),
+							d_Calendario[AnoMes_Num] = _anoMes
+						)
+					RETURN
+						_metaMes * DIVIDE ( _diasUteisSelecionados, _diasUteisMes )
+				)
+			RETURN
+				IF ( NOT _nivelSemMeta, _metaProporcional )
+		formatString: \R$ #,##0
+		displayFolder: 03. Metas
+		lineageTag: ba6ee8a0-62d5-4cf9-98f2-760233263e7d
+
+	/// Receita Líquida ÷ Meta de Faturamento.
+	measure '% Atingimento da Meta' =
+			VAR _receita = [Receita Líquida]
+			VAR _meta = [Meta de Faturamento]
+			RETURN
+				DIVIDE ( _receita, _meta )
+		formatString: 0.0%
+		displayFolder: 03. Metas
+		lineageTag: 1a77aa5f-3869-4ae5-ae03-4416a768d9f0
+
+	/// Receita Líquida − Meta. Negativo = faltou para bater a meta.
+	measure 'Gap vs Meta' =
+			VAR _receita = [Receita Líquida]
+			VAR _meta = [Meta de Faturamento]
+			RETURN
+				IF ( NOT ISBLANK ( _meta ), _receita - _meta )
+		formatString: \R$ #,##0;-\R$ #,##0;\R$ 0
+		displayFolder: 03. Metas
+		lineageTag: 1ca8329d-5cdb-4c91-9bc0-3e140276d548
+
+	/// Classificação textual do atingimento (ícone + texto, para não depender só de cor): ≥100% Atingida; 90–99,9% Em risco; <90% Abaixo da meta.
+	measure 'Status da Meta' =
+			VAR _pct = [% Atingimento da Meta]
+			RETURN
+				SWITCH (
+					TRUE (),
+					ISBLANK ( _pct ), BLANK (),
+					_pct >= 1, "▲ Atingida",
+					_pct >= 0.9, "● Em risco",
+					"▼ Abaixo da meta"
+				)
+		displayFolder: 03. Metas
+		lineageTag: 24c2977c-e658-4cc3-9834-8410494ec336
+
+	/// Cor hexadecimal do status da meta, para formatação condicional (valor do campo). Padrão Vivo: roxo = atingida, lilás = em risco, vermelho = abaixo.
+	measure 'Cor Status da Meta' =
+			VAR _pct = [% Atingimento da Meta]
+			RETURN
+				SWITCH (
+					TRUE (),
+					ISBLANK ( _pct ), "#6B6475",
+					_pct >= 1, "#660099",
+					_pct >= 0.9, "#C39AF0",
+					"#C62828"
+				)
+		displayFolder: 03. Metas
+		lineageTag: 69ce7971-0a94-4546-9b6a-c129d6c2da88
+
+	/// Meta acumulada no ano até a data da última venda (comparável com a Receita Líquida YTD).
+	measure 'Meta YTD' =
+			VAR _ultimaVenda = [Data da Última Venda]
+			VAR _resultado =
+				CALCULATE (
+					[Meta de Faturamento],
+					DATESYTD ( d_Calendario[Data] ),
+					d_Calendario[Data] <= _ultimaVenda
+				)
+			RETURN
+				_resultado
+		formatString: \R$ #,##0
+		displayFolder: 03. Metas
+		lineageTag: 84d2baa4-de38-4722-a14f-b13ef0f2be2e
+
+	/// Receita Líquida YTD ÷ Meta YTD.
+	measure '% Atingimento YTD' =
+			VAR _receitaYTD = [Receita Líquida YTD]
+			VAR _metaYTD = [Meta YTD]
+			RETURN
+				DIVIDE ( _receitaYTD, _metaYTD )
+		formatString: 0.0%
+		displayFolder: 03. Metas
+		lineageTag: 135cd56d-e579-4923-837c-01f24096d33b
+
+	/// Data da venda mais recente disponível no modelo (respeita o RLS).
+	measure 'Data da Última Venda' =
+			VAR _resultado =
+				CALCULATE ( MAX ( f_Vendas[Data_Venda] ), REMOVEFILTERS () )
+			RETURN
+				_resultado
+		formatString: dd/mm/yyyy
+		displayFolder: 04. Inteligência Temporal
+		lineageTag: 92bbde58-ff16-421d-91b4-018643c36b2c
+
+	/// Receita Líquida acumulada desde 1º de janeiro até o fim do período em contexto. Em branco para períodos futuros.
+	measure 'Receita Líquida YTD' =
+			VAR _ultimaVenda = [Data da Última Venda]
+			VAR _inicioContexto = MIN ( d_Calendario[Data] )
+			VAR _resultado =
+				CALCULATE ( [Receita Líquida], DATESYTD ( d_Calendario[Data] ) )
+			RETURN
+				IF ( _inicioContexto <= _ultimaVenda, _resultado )
+		formatString: \R$ #,##0
+		displayFolder: 04. Inteligência Temporal
+		lineageTag: e4b92665-a219-4933-954c-52562b1e511a
+
+	/// Receita Líquida do mesmo período no ano anterior.
+	measure 'Receita Líquida Ano Anterior' =
+			VAR _ultimaVenda = [Data da Última Venda]
+			VAR _inicioContexto = MIN ( d_Calendario[Data] )
+			VAR _resultado =
+				CALCULATE ( [Receita Líquida], SAMEPERIODLASTYEAR ( d_Calendario[Data] ) )
+			RETURN
+				IF ( _inicioContexto <= _ultimaVenda, _resultado )
+		formatString: \R$ #,##0
+		displayFolder: 04. Inteligência Temporal
+		lineageTag: aeb67767-b715-4300-afd3-548d8a7f01e9
+
+	/// Receita Líquida YTD do ano anterior, no mesmo intervalo de datas.
+	measure 'Receita Líquida YTD Ano Anterior' =
+			VAR _ultimaVenda = [Data da Última Venda]
+			VAR _inicioContexto = MIN ( d_Calendario[Data] )
+			VAR _resultado =
+				CALCULATE (
+					CALCULATE ( [Receita Líquida], DATESYTD ( d_Calendario[Data] ) ),
+					SAMEPERIODLASTYEAR ( d_Calendario[Data] )
+				)
+			RETURN
+				IF ( _inicioContexto <= _ultimaVenda, _resultado )
+		formatString: \R$ #,##0
+		displayFolder: 04. Inteligência Temporal
+		lineageTag: 583e5c4d-f491-47ba-922b-ded3f49015d5
+
+	/// Crescimento da Receita Líquida contra o mesmo período do ano anterior: (Atual − Ano Anterior) ÷ Ano Anterior.
+	measure 'YoY %' =
+			VAR _atual = [Receita Líquida]
+			VAR _anoAnterior = [Receita Líquida Ano Anterior]
+			RETURN
+				IF (
+					NOT ISBLANK ( _atual ) && NOT ISBLANK ( _anoAnterior ),
+					DIVIDE ( _atual - _anoAnterior, _anoAnterior )
+				)
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 04. Inteligência Temporal
+		lineageTag: 76ea452b-4ac2-4b6d-8c35-54e46e2c9090
+
+	/// Crescimento acumulado no ano (YTD) contra o YTD do ano anterior.
+	measure 'YoY % YTD' =
+			VAR _atual = [Receita Líquida YTD]
+			VAR _anoAnterior = [Receita Líquida YTD Ano Anterior]
+			RETURN
+				IF (
+					NOT ISBLANK ( _atual ) && NOT ISBLANK ( _anoAnterior ),
+					DIVIDE ( _atual - _anoAnterior, _anoAnterior )
+				)
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 04. Inteligência Temporal
+		lineageTag: 8f387d5a-7bc5-43c2-b492-3d4d399e2060
+
+	/// Média mensal da Receita Líquida dos últimos 3 meses (mês em contexto + 2 anteriores). Exibida só quando os 3 meses têm venda.
+	measure 'Receita Líquida Média Móvel 3M' =
+			VAR _ultimaDataContexto = MAX ( d_Calendario[Data] )
+			VAR _receitaPorMes =
+				CALCULATETABLE (
+					ADDCOLUMNS ( VALUES ( d_Calendario[AnoMes_Num] ), "@Receita", [Receita Líquida] ),
+					DATESINPERIOD ( d_Calendario[Data], _ultimaDataContexto, -3, MONTH )
+				)
+			VAR _mesesComVenda =
+				COUNTROWS ( FILTER ( _receitaPorMes, NOT ISBLANK ( [@Receita] ) ) )
+			VAR _media =
+				AVERAGEX ( _receitaPorMes, [@Receita] )
+			RETURN
+				IF ( _mesesComVenda = 3, _media )
+		formatString: \R$ #,##0
+		displayFolder: 04. Inteligência Temporal
+		lineageTag: a4df775b-e8c2-4919-b8ab-4eac77f1f54c
+
+	/// Cor para a variação YoY (roxo positivo, vermelho negativo).
+	measure 'Cor YoY' =
+			VAR _yoy = [YoY %]
+			RETURN
+				SWITCH ( TRUE (), ISBLANK ( _yoy ), "#6B6475", _yoy >= 0, "#660099", "#C62828" )
+		displayFolder: 04. Inteligência Temporal
+		lineageTag: 3483c1ae-050d-4be6-aa7c-72fe2c54f5b4
+
+	/// Participação da filial na Receita Líquida da SUA regional (total da regional, independente de filtro de filial). Respeita período, categoria e RLS.
+	measure '% Part. Filial na Regional' =
+			VAR _receitaFilial = [Receita Líquida]
+			VAR _receitaRegional =
+				CALCULATE (
+					[Receita Líquida],
+					REMOVEFILTERS ( d_Filial ),
+					KEEPFILTERS ( TREATAS ( VALUES ( d_Filial[Regional] ), d_Regional[Regional] ) )
+				)
+			RETURN
+				IF ( NOT ISBLANK ( _receitaFilial ), DIVIDE ( _receitaFilial, _receitaRegional ) )
+		formatString: 0.0%
+		displayFolder: 05. Participação
+		lineageTag: aa74e873-7ab2-4383-a512-b03bb820a93e
+
+	/// Participação da filial na regional considerando apenas as filiais selecionadas nos filtros (ALLSELECTED).
+	measure '% Part. Filial na Regional (Seleção)' =
+			VAR _receitaFilial = [Receita Líquida]
+			VAR _receitaSelecao =
+				CALCULATE (
+					[Receita Líquida],
+					ALLSELECTED ( d_Filial ),
+					KEEPFILTERS ( TREATAS ( VALUES ( d_Filial[Regional] ), d_Regional[Regional] ) )
+				)
+			RETURN
+				IF ( NOT ISBLANK ( _receitaFilial ), DIVIDE ( _receitaFilial, _receitaSelecao ) )
+		formatString: 0.0%
+		displayFolder: 05. Participação
+		lineageTag: bb48e36c-5124-404d-97ce-238738c16141
+
+	/// Participação da regional no total das regionais selecionadas.
+	measure '% Part. Regional no Total' =
+			VAR _receitaRegional = [Receita Líquida]
+			VAR _receitaTotal =
+				CALCULATE ( [Receita Líquida], ALLSELECTED ( d_Regional ) )
+			RETURN
+				IF ( NOT ISBLANK ( _receitaRegional ), DIVIDE ( _receitaRegional, _receitaTotal ) )
+		formatString: 0.0%
+		displayFolder: 05. Participação
+		lineageTag: 7d1b3a02-4bc9-4487-8f12-d4989f8efd79
+
+	/// Posição da filial por Receita Líquida entre as filiais visíveis (em tabelas/matrizes com a filial nas linhas; não exibe no nível de produto).
+	measure 'Ranking da Filial' =
+			VAR _resultado =
+				RANKX ( ALLSELECTED ( d_Filial[Nome_Filial] ), [Receita Líquida], , DESC, DENSE )
+			RETURN
+				IF (
+					ISINSCOPE ( d_Filial[Nome_Filial] ) && NOT ISINSCOPE ( d_Produto[Nome_Produto] ) && NOT ISBLANK ( [Receita Líquida] ),
+					_resultado
+				)
+		formatString: 0
+		displayFolder: 05. Participação
+		lineageTag: 5f32e71d-76c6-4c3c-a3e5-f08dcdf4b91c
+
+	/// Posição da filial por Receita Líquida para a página de dica de ferramenta (a filial chega como filtro, não como agrupamento).
+	measure 'Ranking da Filial (Tooltip)' =
+			VAR _resultado =
+				RANKX (
+					CALCULATETABLE ( VALUES ( d_Filial[Nome_Filial] ), REMOVEFILTERS ( d_Filial[Nome_Filial] ) ),
+					[Receita Líquida], , DESC, DENSE
+				)
+			RETURN
+				IF ( HASONEVALUE ( d_Filial[Nome_Filial] ) && NOT ISBLANK ( [Receita Líquida] ), _resultado )
+		formatString: 0
+		displayFolder: 05. Participação
+		lineageTag: 5a15530c-fba3-470f-a147-de9dbac13786
+
+	/// Título dinâmico das páginas: reflete regional(is) visível(is) e ano selecionado.
+	measure 'Título Dinâmico' =
+			VAR _regionais = VALUES ( d_Regional[Regional] )
+			VAR _qtdRegionais = COUNTROWS ( _regionais )
+			VAR _textoRegional =
+				IF (
+					_qtdRegionais > 1 && _qtdRegionais = COUNTROWS ( ALL ( d_Regional ) ),
+					"Todas as regionais",
+					CONCATENATEX ( _regionais, d_Regional[Regional], ", ", d_Regional[Regional], ASC )
+				)
+			VAR _textoAno =
+				IF ( HASONEVALUE ( d_Calendario[Ano] ), " · " & VALUES ( d_Calendario[Ano] ), "" )
+			RETURN
+				"Desempenho comercial · " & _textoRegional & _textoAno
+		displayFolder: 06. Rótulos e UX
+		lineageTag: 8e086e3f-b54a-4883-9d9e-0e3018ada73a
+
+	/// Texto de atualização exibido no cabeçalho.
+	measure 'Texto Atualização' =
+			VAR _ultimaVenda = [Data da Última Venda]
+			RETURN
+				"Dados até " & FORMAT ( _ultimaVenda, "dd/mm/yyyy" )
+		displayFolder: 06. Rótulos e UX
+		lineageTag: 58e13b9f-5751-45ac-8c05-2dd7ed35ec58
+
+	/// Resumo executivo em linguagem natural (também usado como texto alternativo dos cartões).
+	measure 'Narrativa Executiva' =
+			VAR _receita = [Receita Líquida]
+			VAR _yoy = [YoY %]
+			VAR _margem = [% Margem]
+			VAR _atingimento = [% Atingimento da Meta]
+			VAR _textoYoY =
+				IF ( NOT ISBLANK ( _yoy ), " (" & FORMAT ( _yoy, "+0.0%;-0.0%" ) & " vs. ano anterior)", "" )
+			VAR _textoMeta =
+				IF ( NOT ISBLANK ( _atingimento ), " e " & FORMAT ( _atingimento, "0.0%" ) & " da meta.", "." )
+			RETURN
+				IF (
+					NOT ISBLANK ( _receita ),
+					"Receita líquida de R$ " & FORMAT ( _receita / 1000000, "#,##0.0" ) & " mi" & _textoYoY
+						& ", margem de " & FORMAT ( _margem, "0.0%" ) & _textoMeta
+				)
+		displayFolder: 06. Rótulos e UX
+		lineageTag: c7557aa7-5d13-48ee-a389-76ec1b04eb02
+
+	/// E-mail do usuário conectado (USERPRINCIPALNAME).
+	measure 'Usuário Conectado' = USERPRINCIPALNAME ()
+		displayFolder: 07. Segurança
+		lineageTag: d88b37a5-15be-4c9e-a4e8-1bd4bd1bc0dc
+
+	/// Perfil de acesso do usuário conectado conforme a tabela Seguranca_RLS.
+	measure 'Perfil de Acesso' =
+			VAR _email = USERPRINCIPALNAME ()
+			VAR _cargo =
+				CALCULATE ( MAX ( Seguranca_RLS[Cargo] ), Seguranca_RLS[Email_Usuario] = _email )
+			VAR _regional =
+				CALCULATE ( MAX ( Seguranca_RLS[Regional_Acesso] ), Seguranca_RLS[Email_Usuario] = _email )
+			RETURN
+				IF ( ISBLANK ( _cargo ), "Sem perfil cadastrado", _cargo & " · " & _regional )
+		displayFolder: 07. Segurança
+		lineageTag: e1bc7502-bdf8-4af2-83d5-52f29b153738
+
+	/// Ticket médio do mesmo período no ano anterior.
+	measure 'Ticket Médio Ano Anterior' =
+			VAR _resultado =
+				CALCULATE ( [Ticket Médio por NF], SAMEPERIODLASTYEAR ( d_Calendario[Data] ) )
+			RETURN
+				_resultado
+		formatString: \R$ #,##0
+		displayFolder: 04. Inteligência Temporal
+
+	/// Crescimento do ticket médio contra o mesmo período do ano anterior.
+	measure 'YoY % Ticket' =
+			VAR _atual = [Ticket Médio por NF]
+			VAR _anterior = [Ticket Médio Ano Anterior]
+			RETURN
+				IF ( NOT ISBLANK ( _atual ) && NOT ISBLANK ( _anterior ), DIVIDE ( _atual - _anterior, _anterior ) )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 04. Inteligência Temporal
+
+	/// Texto "vs. <ano anterior>" exibido abaixo das variações nos cartões.
+	measure 'Texto vs Ano Anterior' =
+			IF (
+				HASONEVALUE ( d_Calendario[Ano] ),
+				"vs. " & ( VALUES ( d_Calendario[Ano] ) - 1 ),
+				"vs. ano anterior"
+			)
+		displayFolder: 08. Cartões do Painel
+
+	/// Variação YoY da receita formatada com seta, para o cartão.
+	measure 'KPI Receita Ref' =
+			VAR _v = [YoY %]
+			RETURN
+				IF ( ISBLANK ( _v ), "—", IF ( _v >= 0, "▲ ", "▼ " ) & FORMAT ( _v, "+0.0%;-0.0%" ) )
+		displayFolder: 08. Cartões do Painel
+
+	/// Cor da variação YoY da receita (roxo = alta, vermelho = queda).
+	measure 'KPI Receita Cor' =
+			VAR _v = [YoY %]
+			RETURN
+				IF ( ISBLANK ( _v ), "#6B6475", IF ( _v >= 0, "#660099", "#C62828" ) )
+		displayFolder: 08. Cartões do Painel
+
+	/// Situação da meta em texto, para o cartão.
+	measure 'KPI Atingimento Ref' =
+			VAR _p = [% Atingimento da Meta]
+			RETURN
+				SWITCH ( TRUE (), ISBLANK ( _p ), "—", _p >= 1, "▲ Acima da meta", _p >= 0.9, "● Em risco", "▼ Abaixo da meta" )
+		displayFolder: 08. Cartões do Painel
+
+	/// Cor da situação da meta para texto (tons com contraste suficiente sobre branco).
+	measure 'KPI Atingimento Cor' =
+			VAR _p = [% Atingimento da Meta]
+			RETURN
+				SWITCH ( TRUE (), ISBLANK ( _p ), "#6B6475", _p >= 1, "#660099", _p >= 0.9, "#8A3FC9", "#C62828" )
+		displayFolder: 08. Cartões do Painel
+
+	/// Valor da meta do período, em milhões, para o cartão.
+	measure 'KPI Meta Texto' =
+			VAR _m = [Meta de Faturamento]
+			RETURN
+				IF ( ISBLANK ( _m ), "", "meta R$ " & FORMAT ( _m / 1000000, "#,##0.0" ) & " mi" )
+		displayFolder: 08. Cartões do Painel
+
+	/// Variação da margem contra o ano anterior, em p.p., para o cartão.
+	measure 'KPI Margem Ref' =
+			VAR _d = [Δ Margem vs Ano Anterior (p.p.)]
+			RETURN
+				IF ( ISBLANK ( _d ), "—", IF ( _d >= 0, "▲ ", "▼ " ) & FORMAT ( _d, "+0.0;-0.0" ) & " p.p." )
+		displayFolder: 08. Cartões do Painel
+
+	/// Cor da variação da margem.
+	measure 'KPI Margem Cor' =
+			VAR _d = [Δ Margem vs Ano Anterior (p.p.)]
+			RETURN
+				IF ( ISBLANK ( _d ), "#6B6475", IF ( _d >= 0, "#660099", "#C62828" ) )
+		displayFolder: 08. Cartões do Painel
+
+	/// Atingimento da meta YTD formatado com seta, para o cartão.
+	measure 'KPI YTD Ref' =
+			VAR _p = [% Atingimento YTD]
+			RETURN
+				IF ( ISBLANK ( _p ), "—", IF ( _p >= 1, "▲ ", "▼ " ) & FORMAT ( _p, "0.0%" ) )
+		displayFolder: 08. Cartões do Painel
+
+	/// Cor do atingimento YTD.
+	measure 'KPI YTD Cor' =
+			VAR _p = [% Atingimento YTD]
+			RETURN
+				SWITCH ( TRUE (), ISBLANK ( _p ), "#6B6475", _p >= 1, "#660099", _p >= 0.9, "#8A3FC9", "#C62828" )
+		displayFolder: 08. Cartões do Painel
+
+	/// Variação YoY do ticket médio formatada com seta, para o cartão.
+	measure 'KPI Ticket Ref' =
+			VAR _v = [YoY % Ticket]
+			RETURN
+				IF ( ISBLANK ( _v ), "—", IF ( _v >= 0, "▲ ", "▼ " ) & FORMAT ( _v, "+0.0%;-0.0%" ) )
+		displayFolder: 08. Cartões do Painel
+
+	/// Cor da variação do ticket médio.
+	measure 'KPI Ticket Cor' =
+			VAR _v = [YoY % Ticket]
+			RETURN
+				IF ( ISBLANK ( _v ), "#6B6475", IF ( _v >= 0, "#660099", "#C62828" ) )
+		displayFolder: 08. Cartões do Painel
+
+	/// Célula da matriz Regional × Categoria: ícone de status + % de atingimento e, na linha de baixo, a receita líquida.
+	measure 'Célula Matriz' =
+			VAR _p = [% Atingimento da Meta]
+			VAR _r = [Receita Líquida]
+			VAR _icone =
+				SWITCH ( TRUE (), ISBLANK ( _p ), "", _p >= 1, "▲ ", _p >= 0.9, "● ", "▼ " )
+			RETURN
+				IF (
+					NOT ISBLANK ( _r ),
+					_icone & IF ( ISBLANK ( _p ), "", FORMAT ( _p, "0.0%" ) ) & UNICHAR ( 10 ) & "R$ " & FORMAT ( _r, "#,##0" )
+				)
+		displayFolder: 08. Cartões do Painel
+
+	/// Segundo parágrafo do resumo: melhor e pior regional na meta e maior queda de margem no último trimestre do período.
+	measure 'Narrativa Regionais' =
+			VAR _tab =
+				FILTER (
+					ADDCOLUMNS ( VALUES ( d_Regional[Regional] ), "@a", [% Atingimento da Meta] ),
+					NOT ISBLANK ( [@a] )
+				)
+			VAR _melhor = MAXX ( TOPN ( 1, _tab, [@a], DESC ), d_Regional[Regional] )
+			VAR _pior = MAXX ( TOPN ( 1, _tab, [@a], ASC ), d_Regional[Regional] )
+			VAR _pMelhor = MAXX ( _tab, [@a] )
+			VAR _pPior = MINX ( _tab, [@a] )
+			VAR _ultimaData = MIN ( MAX ( d_Calendario[Data] ), [Data da Última Venda] )
+			VAR _triAtual = YEAR ( _ultimaData ) * 10 + QUARTER ( _ultimaData )
+			VAR _triAnterior = IF ( MOD ( _triAtual, 10 ) = 1, ( INT ( _triAtual / 10 ) - 1 ) * 10 + 4, _triAtual - 1 )
+			VAR _margens =
+				FILTER (
+					ADDCOLUMNS (
+						VALUES ( d_Regional[Regional] ),
+						"@d",
+							CALCULATE ( [% Margem], REMOVEFILTERS ( d_Calendario ), d_Calendario[AnoTrimestre_Num] = _triAtual )
+								- CALCULATE ( [% Margem], REMOVEFILTERS ( d_Calendario ), d_Calendario[AnoTrimestre_Num] = _triAnterior )
+					),
+					NOT ISBLANK ( [@d] )
+				)
+			VAR _regQueda = MAXX ( TOPN ( 1, _margens, [@d], ASC ), d_Regional[Regional] )
+			VAR _dQueda = MINX ( _margens, [@d] )
+			VAR _textoRank =
+				IF (
+					COUNTROWS ( _tab ) > 1,
+					"Destaque: " & _melhor & " (" & FORMAT ( _pMelhor, "0.0%" ) & " da meta). Atenção: " & _pior & " ("
+						& FORMAT ( _pPior, "0.0%" ) & ").",
+					""
+				)
+			VAR _textoMargem =
+				IF (
+					_dQueda < -0.005,
+					" Maior queda de margem no T" & MOD ( _triAtual, 10 ) & "/" & INT ( _triAtual / 10 ) & ": " & _regQueda
+						& " (" & FORMAT ( _dQueda * 100, "+0.0;-0.0" ) & " p.p.).",
+					""
+				)
+			RETURN
+				_textoRank & _textoMargem
+		displayFolder: 08. Cartões do Painel
+
+	/// Recomendação de foco: regional e categoria mais distantes da meta no contexto atual.
+	measure 'Foco Recomendado' =
+			VAR _regs =
+				FILTER ( ADDCOLUMNS ( VALUES ( d_Regional[Regional] ), "@a", [% Atingimento da Meta] ), NOT ISBLANK ( [@a] ) )
+			VAR _cats =
+				FILTER ( ADDCOLUMNS ( VALUES ( d_Categoria[Categoria] ), "@a", [% Atingimento da Meta] ), NOT ISBLANK ( [@a] ) )
+			VAR _pior = MAXX ( TOPN ( 1, _regs, [@a], ASC ), d_Regional[Regional] )
+			VAR _pPior = MINX ( _regs, [@a] )
+			VAR _cat = MAXX ( TOPN ( 1, _cats, [@a], ASC ), d_Categoria[Categoria] )
+			VAR _pCat = MINX ( _cats, [@a] )
+			RETURN
+				IF (
+					NOT ISBLANK ( _pCat ),
+					"Foco: "
+						& IF ( COUNTROWS ( _regs ) > 1, "regional " & _pior & " (" & FORMAT ( _pPior, "0.0%" ) & " da meta) e ", "" )
+						& "categoria " & _cat & " (" & FORMAT ( _pCat, "0.0%" ) & ")."
+				)
+		displayFolder: 08. Cartões do Painel
+
+	column Value
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 615088fd-a832-47fe-806e-5d427f61887d
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Value]
+
+	partition _Medidas = calculated
+		mode: import
+		source = { 0 }
+

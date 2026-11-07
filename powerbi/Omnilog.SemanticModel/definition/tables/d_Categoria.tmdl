@@ -1,0 +1,42 @@
+/// Dimensão conformada de Categoria: filtra Vendas e Metas.
+table d_Categoria
+	lineageTag: ca32bcc1-99e0-4f07-9e81-48605d09299a
+
+	column Id_Categoria
+		dataType: int64
+		isHidden
+		isKey
+		formatString: 0
+		lineageTag: 3fee43aa-b9e2-4705-877d-4feca69ceccf
+		summarizeBy: none
+		sourceColumn: Id_Categoria
+
+	column Categoria
+		dataType: string
+		lineageTag: ded4bc2c-9883-4ebd-8ed8-e748f99a6483
+		summarizeBy: none
+		sourceColumn: Categoria
+		sortByColumn: Ordem
+
+	column Ordem
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 71684207-5ae2-46fa-b6b6-d2860ec7d522
+		summarizeBy: none
+		sourceColumn: Ordem
+
+	partition d_Categoria = m
+		mode: import
+		source =
+				let
+				    // Mesma estrutura nas duas origens: a view SQL bi.vw_d_Categoria ou o CSV equivalente
+				    Dados =
+				        if FonteDados = "SQL"
+				        then Sql.Database(Servidor, BancoDeDados){[Schema = "bi", Item = "vw_d_Categoria"]}[Data]
+				        else fnLerCsv("d_Categoria.csv", {{"Id_Categoria", Int64.Type}, {"Categoria", type text}, {"Ordem", Int64.Type}})
+				in
+				    Dados
+
+	annotation PBI_ResultType = Table
+

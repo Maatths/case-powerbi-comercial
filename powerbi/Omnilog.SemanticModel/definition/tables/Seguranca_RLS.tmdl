@@ -1,0 +1,47 @@
+/// Mapeamento usuário (UPN do Entra ID) → regional autorizada. Tabela desconectada e oculta, lida apenas pela regra de RLS.
+table Seguranca_RLS
+	isHidden
+	lineageTag: 4a0ec85f-4304-4896-affb-5818acb324d5
+
+	column Email_Usuario
+		dataType: string
+		isHidden
+		lineageTag: 1ccaa963-4dd4-414b-8451-e17600f05e24
+		summarizeBy: none
+		sourceColumn: Email_Usuario
+
+	column Nome_Usuario
+		dataType: string
+		isHidden
+		lineageTag: ad8e87ec-3889-4b84-9ede-3077b0932e3a
+		summarizeBy: none
+		sourceColumn: Nome_Usuario
+
+	column Cargo
+		dataType: string
+		isHidden
+		lineageTag: 8d2e8f80-cedb-4bd8-aa9e-c8bd3fd7f579
+		summarizeBy: none
+		sourceColumn: Cargo
+
+	column Regional_Acesso
+		dataType: string
+		isHidden
+		lineageTag: 89dad903-72ea-408e-ae29-b067f71edb93
+		summarizeBy: none
+		sourceColumn: Regional_Acesso
+
+	partition Seguranca_RLS = m
+		mode: import
+		source =
+				let
+				    // Mesma estrutura nas duas origens: a view SQL bi.vw_Seguranca_RLS ou o CSV equivalente
+				    Dados =
+				        if FonteDados = "SQL"
+				        then Sql.Database(Servidor, BancoDeDados){[Schema = "bi", Item = "vw_Seguranca_RLS"]}[Data]
+				        else fnLerCsv("Seguranca_RLS.csv", {{"Email_Usuario", type text}, {"Nome_Usuario", type text}, {"Cargo", type text}, {"Regional_Acesso", type text}})
+				in
+				    Dados
+
+	annotation PBI_ResultType = Table
+

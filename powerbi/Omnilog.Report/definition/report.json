@@ -1,0 +1,59 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/report/3.0.0/schema.json",
+  "themeCollection": {
+    "customTheme": {
+      "name": "Omnilog_Corporativo_(padr_o_Vi5344206300125747.json",
+      "reportVersionAtImport": {
+        "visual": "2.4.0",
+        "report": "3.0.0",
+        "page": "2.3.0"
+      },
+      "type": "RegisteredResources"
+    }
+  },
+  "objects": {
+    "outspacePane": [
+      {
+        "properties": {
+          "expanded": {
+            "expr": {
+              "Literal": {
+                "Value": "false"
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "resourcePackages": [
+    {
+      "name": "RegisteredResources",
+      "type": "RegisteredResources",
+      "items": [
+        {
+          "name": "fundo_detalhamento.png",
+          "path": "fundo_detalhamento.png",
+          "type": "Image"
+        },
+        {
+          "name": "fundo_visao_clevel.png",
+          "path": "fundo_visao_clevel.png",
+          "type": "Image"
+        },
+        {
+          "name": "Omnilog_Corporativo_(padr_o_Vi5344206300125747.json",
+          "path": "Omnilog_Corporativo_(padr_o_Vi5344206300125747.json",
+          "type": "CustomTheme"
+        }
+      ]
+    }
+  ],
+  "settings": {
+    "useStylableVisualContainerHeader": true,
+    "exportDataMode": "AllowSummarized",
+    "defaultDrillFilterOtherVisuals": true,
+    "allowChangeFilterTypes": true,
+    "useDefaultAggregateDisplayName": true
+  }
+}

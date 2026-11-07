@@ -1,0 +1,9 @@
+﻿Id_Filial,Cod_Filial,Nome_Filial,Cidade,UF,Cidade_UF,Regional
+1,"FL-SP01","Filial São Paulo Matriz","São Paulo","SP","São Paulo - SP","Sudeste"
+2,"FL-RJ01","Filial Rio de Janeiro","Rio de Janeiro","RJ","Rio de Janeiro - RJ","Sudeste"
+3,"FL-MG01","Filial Belo Horizonte","Belo Horizonte","MG","Belo Horizonte - MG","Sudeste"
+4,"FL-PR01","Filial Curitiba","Curitiba","PR","Curitiba - PR","Sul"
+5,"FL-RS01","Filial Porto Alegre","Porto Alegre","RS","Porto Alegre - RS","Sul"
+6,"FL-BA01","Filial Salvador","Salvador","BA","Salvador - BA","Nordeste"
+7,"FL-PE01","Filial Recife","Recife","PE","Recife - PE","Nordeste"
+8,"FL-PA01","Filial Belém","Belém","PA","Belém - PA","Norte"

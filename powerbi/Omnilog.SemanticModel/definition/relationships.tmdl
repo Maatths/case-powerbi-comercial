@@ -1,0 +1,32 @@
+relationship rel_fVendas_dCalendario
+	fromColumn: f_Vendas.Data_Venda
+	toColumn: d_Calendario.Data
+
+relationship rel_fVendas_dFilial
+	fromColumn: f_Vendas.Id_Filial
+	toColumn: d_Filial.Id_Filial
+
+relationship rel_fVendas_dProduto
+	fromColumn: f_Vendas.Id_Produto
+	toColumn: d_Produto.Id_Produto
+
+relationship rel_fVendas_dRegional
+	fromColumn: f_Vendas.Id_Regional
+	toColumn: d_Regional.Id_Regional
+
+relationship rel_fVendas_dCategoria
+	fromColumn: f_Vendas.Id_Categoria
+	toColumn: d_Categoria.Id_Categoria
+
+relationship rel_fMetas_dCalendario
+	fromColumn: f_Metas.Data_Mes
+	toColumn: d_Calendario.Data
+
+relationship rel_fMetas_dRegional
+	fromColumn: f_Metas.Id_Regional
+	toColumn: d_Regional.Id_Regional
+
+relationship rel_fMetas_dCategoria
+	fromColumn: f_Metas.Id_Categoria
+	toColumn: d_Categoria.Id_Categoria
+

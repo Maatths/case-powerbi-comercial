@@ -1,0 +1,68 @@
+/// Filiais. Origem: bi.vw_d_Filial. Filtrada pelo RLS por regional.
+table d_Filial
+	lineageTag: 3ba0fcb8-3f00-4d5b-8873-d2f9b97825ed
+
+	column Id_Filial
+		dataType: int64
+		isHidden
+		isKey
+		formatString: 0
+		lineageTag: 96021aac-e4de-4706-9843-8264397f1b5b
+		summarizeBy: none
+		sourceColumn: Id_Filial
+
+	column Cod_Filial
+		dataType: string
+		lineageTag: 3379c176-b9be-45fb-91cc-cb6383f53980
+		summarizeBy: none
+		sourceColumn: Cod_Filial
+
+	column Nome_Filial
+		dataType: string
+		lineageTag: 620e4180-e633-4568-bfde-89b4a9163df3
+		summarizeBy: none
+		sourceColumn: Nome_Filial
+
+	column Cidade
+		dataType: string
+		lineageTag: 648dd51b-995a-4bbe-ba7e-622012f4cc2f
+		dataCategory: City
+		summarizeBy: none
+		sourceColumn: Cidade
+
+	column UF
+		dataType: string
+		lineageTag: 0ddc97f0-219d-4d5f-a812-580aaec41fb2
+		dataCategory: StateOrProvince
+		summarizeBy: none
+		sourceColumn: UF
+
+	column Cidade_UF
+		dataType: string
+		lineageTag: 31e5ca48-09b5-4ee6-8bae-05bd49e3715d
+		dataCategory: Place
+		summarizeBy: none
+		sourceColumn: Cidade_UF
+
+	/// Regional da filial (técnica: usada pelo RLS e pela medida de participação). Para filtros, use d_Regional.
+	column Regional
+		dataType: string
+		isHidden
+		lineageTag: 4b15ffd8-af77-42d4-af5a-26ade0e34c99
+		summarizeBy: none
+		sourceColumn: Regional
+
+	partition d_Filial = m
+		mode: import
+		source =
+				let
+				    // Mesma estrutura nas duas origens: a view SQL bi.vw_d_Filial ou o CSV equivalente
+				    Dados =
+				        if FonteDados = "SQL"
+				        then Sql.Database(Servidor, BancoDeDados){[Schema = "bi", Item = "vw_d_Filial"]}[Data]
+				        else fnLerCsv("d_Filial.csv", {{"Id_Filial", Int64.Type}, {"Cod_Filial", type text}, {"Nome_Filial", type text}, {"Cidade", type text}, {"UF", type text}, {"Cidade_UF", type text}, {"Regional", type text}})
+				in
+				    Dados
+
+	annotation PBI_ResultType = Table
+

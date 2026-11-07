@@ -1,0 +1,25 @@
+role 'Acesso por Regional'
+	modelPermission: read
+
+	tablePermission d_Regional =
+			VAR _acessos =
+				CALCULATETABLE (
+					VALUES ( Seguranca_RLS[Regional_Acesso] ),
+					Seguranca_RLS[Email_Usuario] = USERPRINCIPALNAME ()
+				)
+			RETURN
+				"TODAS" IN _acessos || d_Regional[Regional] IN _acessos
+
+	tablePermission d_Filial =
+			VAR _acessos =
+				CALCULATETABLE (
+					VALUES ( Seguranca_RLS[Regional_Acesso] ),
+					Seguranca_RLS[Email_Usuario] = USERPRINCIPALNAME ()
+				)
+			RETURN
+				"TODAS" IN _acessos || d_Filial[Regional] IN _acessos
+
+	tablePermission Seguranca_RLS = Seguranca_RLS[Email_Usuario] = USERPRINCIPALNAME ()
+
+	annotation PBI_Id = fc64d28b563d4a0e962bf4d793561928
+

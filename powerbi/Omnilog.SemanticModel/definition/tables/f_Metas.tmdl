@@ -1,0 +1,52 @@
+/// Fato de metas no grão Regional × Categoria × Mês. Data_Mes = 1º dia do mês. Origem: bi.vw_f_Metas.
+table f_Metas
+	lineageTag: d33b35ad-a0a8-45a9-812a-19d6db40f2ad
+
+	column Data_Mes
+		dataType: dateTime
+		isHidden
+		formatString: dd/mm/yyyy
+		lineageTag: 1f116682-3524-4366-a99e-b689462d39f2
+		summarizeBy: none
+		sourceColumn: Data_Mes
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Id_Regional
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: b56f7bcd-1504-44c6-9e4c-d876f7d511fa
+		summarizeBy: none
+		sourceColumn: Id_Regional
+
+	column Id_Categoria
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 3937e778-e0bc-495d-8f8d-d5da4cf1abb1
+		summarizeBy: none
+		sourceColumn: Id_Categoria
+
+	column Meta_Faturamento
+		dataType: double
+		isHidden
+		formatString: \R$ #,##0.00
+		lineageTag: d0b89ffa-a0c3-45bf-8661-e5e25c212690
+		summarizeBy: sum
+		sourceColumn: Meta_Faturamento
+
+	partition f_Metas = m
+		mode: import
+		source =
+				let
+				    // Mesma estrutura nas duas origens: a view SQL bi.vw_f_Metas ou o CSV equivalente
+				    Dados =
+				        if FonteDados = "SQL"
+				        then Sql.Database(Servidor, BancoDeDados){[Schema = "bi", Item = "vw_f_Metas"]}[Data]
+				        else fnLerCsv("f_Metas.csv", {{"Data_Mes", type date}, {"Id_Regional", Int64.Type}, {"Id_Categoria", Int64.Type}, {"Meta_Faturamento", type number}})
+				in
+				    Dados
+
+	annotation PBI_ResultType = Table
+
